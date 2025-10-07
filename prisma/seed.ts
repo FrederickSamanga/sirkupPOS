@@ -25,15 +25,15 @@ async function main() {
   })
 
   // Create demo users with hashed PINs
-  const adminPin = await bcrypt.hash('123456', 10)
+  const adminPin = await bcrypt.hash('001433', 10)
   const cashierPin = await bcrypt.hash('111111', 10)
   const kitchenPin = await bcrypt.hash('222222', 10)
 
   await prisma.user.upsert({
-    where: { email: 'admin@amayacafe.com' },
+    where: { email: 'test@sirkupaicafepos.com' },
     update: {},
     create: {
-      email: 'admin@amayacafe.com',
+      email: 'test@sirkupaicafepos.com',
       name: 'Admin User',
       pin: adminPin,
       role: 'ADMIN',
