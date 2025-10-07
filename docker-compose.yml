@@ -1,0 +1,107 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: amaya_pos_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: amaya_pos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - amaya_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: amaya_pos_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass redis_password
+    networks:
+      - amaya_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO Object Storage (for images)
+  minio:
+    image: minio/minio:latest
+    container_name: amaya_pos_storage
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_DEFAULT_BUCKETS: images:public
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - amaya_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Adminer - Database Management UI
+  adminer:
+    image: adminer:latest
+    container_name: amaya_pos_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: nette
+    networks:
+      - amaya_network
+    depends_on:
+      - postgres
+
+  # RedisInsight - Redis Management UI
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: amaya_pos_redis_ui
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_data:/db
+    networks:
+      - amaya_network
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  redis_insight_data:
+    driver: local
+
+networks:
+  amaya_network:
+    driver: bridge

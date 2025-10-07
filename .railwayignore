@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build artifacts (Railway will rebuild)
+.next/
+out/
+
+# Development files
+.env.local
+.env.development
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
