@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // FIX FOR LOCKFILE WARNING - Explicitly set workspace root
-  outputFileTracingRoot: '/home/frederick/dev/cafe-app',
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
 
   // Keep existing configs
   typescript: {
