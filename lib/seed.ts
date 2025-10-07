@@ -14,12 +14,12 @@ export async function seedDatabase() {
 
     // Create admin user
     await prisma.user.upsert({
-      where: { email: 'admin@amayacafe.com' },
+      where: { email: 'test@sirkupaicafepos.com' },
       update: {},
       create: {
         name: 'Admin User',
-        email: 'admin@amayacafe.com',
-        pin: '1234',
+        email: 'test@sirkupaicafepos.com',
+        pin: '001433',
         role: 'ADMIN'
       }
     })
